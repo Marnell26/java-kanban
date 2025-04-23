@@ -10,6 +10,13 @@ public class Task {
     public Task(String name, String description, int id, Status status) {
         this.name = name;
         this.description = description;
+        this.id = id;
+        this.status = status;
+    }
+
+    public Task(String name, String description, int id) {
+        this.name = name;
+        this.description = description;
     }
 
     @Override
@@ -22,6 +29,6 @@ public class Task {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, status);
+        return Objects.hash(id);
     }
 }

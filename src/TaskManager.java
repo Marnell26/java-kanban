@@ -26,16 +26,16 @@ public class TaskManager {
     }
 
     public void createEpic(String name, String description) {
-        id++;
+        int id = generateTaskId();
         Status status = Status.NEW;
-        Epic epic = new Epic(name, description, id, status);
+        Epic epic = new Epic(name, description, id);
         epics.put(id, epic);
     }
 
     public void createSubTask(String name, String description) {
-        id++;
+        int id = generateTaskId();
         Status status = Status.NEW;
-        Subtask subtask = new Subtask(name, description, id, status);
+        Subtask subtask = new Subtask(name, description, id);
         subtasks.put(id, subtask);
     }
 
@@ -45,7 +45,7 @@ public class TaskManager {
         subtasks.clear();
     }
 
-    public void deleteTask() {
+    public void deleteTask(int id) {
 
     }
 
@@ -53,11 +53,11 @@ public class TaskManager {
 
     }
 
-    public void getTaskById() {
+    public void getTaskById(int id) {
 
     }
 
-    public void refreshTask() {
+    public void refreshTask(Task task) {
 
     }
 
