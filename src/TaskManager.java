@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TaskManager {
@@ -20,22 +21,19 @@ public class TaskManager {
 
     public void createTask(String name, String description) {
         int id = generateTaskId();
-        Status status = Status.NEW;
-        Task task = new Task(name, description, id, status);
+        Task task = new Task(name, description, id);
         tasks.put(id, task);
     }
 
-    public void createEpic(String name, String description) {
-        int id = generateTaskId();
-        Status status = Status.NEW;
+    public void createEpic(String name, String description, int id) {
+        id = generateTaskId();
         Epic epic = new Epic(name, description, id);
         epics.put(id, epic);
     }
 
-    public void createSubTask(String name, String description) {
+    public void createSubTask(String name, String description, int epicId) {
         int id = generateTaskId();
-        Status status = Status.NEW;
-        Subtask subtask = new Subtask(name, description, id);
+        Subtask subtask = new Subtask(name, description, id, epicId);
         subtasks.put(id, subtask);
     }
 
@@ -46,11 +44,21 @@ public class TaskManager {
     }
 
     public void deleteTask(int id) {
-
+       tasks.remove(id);
+       epics.remove(id);
+       subtasks.remove(id);
     }
 
-    public void getTasks() {
+    public HashMap<Integer, Task> getTasks() {
+        return tasks;
+    }
 
+    public HashMap<Integer, Epic> getEpics() {
+        return epics;
+    }
+
+    public HashMap<Integer, Subtask> getSubtasks() {
+        return subtasks;
     }
 
     public void getTaskById(int id) {
@@ -61,8 +69,10 @@ public class TaskManager {
 
     }
 
-    public void getSubtasksByEpic() {
-
+    public ArrayList<Subtask> getSubtasksByEpic(int epicId) {
+        Epic epic = epics.get(epicId);
+        ArrayList<Subtask> subtasks = epic.getSubtasksId();
+        return subtasks;
     }
 
 }

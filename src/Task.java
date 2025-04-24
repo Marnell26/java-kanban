@@ -7,16 +7,17 @@ public class Task {
     protected String description;
     protected Status status;
 
-    public Task(String name, String description, int id, Status status) {
-        this.name = name;
-        this.description = description;
-        this.id = id;
-        this.status = status;
-    }
-
     public Task(String name, String description, int id) {
         this.name = name;
         this.description = description;
+        this.id = id;
+        this.status = Status.NEW;
+    }
+
+    public Task(String name, String description, Status status) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
     }
 
     @Override
@@ -24,11 +25,21 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id;
+        return Objects.equals(id, this.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, name, status, description);
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
     }
 }
