@@ -6,7 +6,7 @@ public class TaskManager {
     private HashMap<Integer, Task> tasks;
     private HashMap<Integer, Epic> epics;
     private HashMap<Integer, Subtask> subtasks;
-    private int id = 0;
+    private Integer id = 0;
 
     public TaskManager() {
         tasks = new HashMap<>();
@@ -14,62 +14,86 @@ public class TaskManager {
         subtasks = new HashMap<>();
     }
 
-    public int generateTaskId() {
+    public Integer generateTaskId() {
         id++;
         return id;
     }
 
-    public void createTask(String name, String description) {
-        int id = generateTaskId();
-        Task task = new Task(name, description, id);
-        tasks.put(id, task);
+    public ArrayList<Task> getTasks() {
+        return new ArrayList<>(tasks.values());
     }
 
-    public void createEpic(String name, String description, int id) {
-        id = generateTaskId();
-        Epic epic = new Epic(name, description, id);
-        epics.put(id, epic);
+    public ArrayList<Epic> getEpics() {
+        return new ArrayList<>(epics.values());
     }
 
-    public void createSubTask(String name, String description, int epicId) {
-        int id = generateTaskId();
-        Subtask subtask = new Subtask(name, description, id, epicId);
-        subtasks.put(id, subtask);
+    public ArrayList<Subtask> getSubtasks() {
+        return new ArrayList<>(subtasks.values());
     }
 
     public void clearTasks() {
         tasks.clear();
+    }
+
+    public void clearEpics() {
         epics.clear();
+    }
+
+    public void clearSubtasks() {
         subtasks.clear();
     }
 
-    public void deleteTask(int id) {
+    public Task getTaskById(Integer id) {
+        return tasks.get(id);
+    }
+
+    public Epic getEpicById(Integer id) {
+        return epics.get(id);
+    }
+
+    public Subtask getSubtaskById(Integer id) {
+        return subtasks.get(id);
+    }
+
+    public void createTask(String name, String description) {
+        int id = generateTaskId();
+        Task task = new Task(id, name, description);
+        tasks.put(id, task);
+    }
+
+    public void createEpic(String name, String description) {
+        id = generateTaskId();
+        Epic epic = new Epic(id, name, description);
+        epics.put(id, epic);
+    }
+
+    public void createSubTask(String name, String description, Integer epicId) {
+        Integer id = generateTaskId();
+        Subtask subtask = new Subtask(id, name, description, epicId);
+        subtasks.put(id, subtask);
+    }
+
+    public void deleteTask(Integer id) {
        tasks.remove(id);
-       epics.remove(id);
-       subtasks.remove(id);
     }
 
-    public HashMap<Integer, Task> getTasks() {
-        return tasks;
+    public void deleteEpic(Integer id) {
+        epics.remove(id);
     }
 
-    public HashMap<Integer, Epic> getEpics() {
-        return epics;
+    public void deleteSubtask(Integer id) {
+        subtasks.remove(id);
     }
 
-    public HashMap<Integer, Subtask> getSubtasks() {
-        return subtasks;
-    }
-
-    public void getTaskById(int id) {
+    public void updateTask(Task task) {
 
     }
 
-    public void refreshTask(Task task) {
+    public void updateSubTask() {
 
     }
 
-    public ArrayList<Subtask> getSubtasksByEpic(int epicId) {
+    public ArrayList<Subtask> getSubtasksByEpic(Integer epicId) {
         Epic epic = epics.get(epicId);
         ArrayList<Subtask> subtasks = epic.getSubtasksId();
         return subtasks;

@@ -7,7 +7,7 @@ public class Task {
     protected String description;
     protected Status status;
 
-    public Task(String name, String description, int id) {
+    public Task(Integer id, String name, String description) {
         this.name = name;
         this.description = description;
         this.id = id;
@@ -30,7 +30,7 @@ public class Task {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, status, description);
+        return Objects.hashCode(id);
     }
 
     @Override
