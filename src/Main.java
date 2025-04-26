@@ -4,8 +4,6 @@ import model.Status;
 import model.Subtask;
 import model.Task;
 
-import java.sql.SQLOutput;
-
 public class Main {
 
     public static void main(String[] args) {
@@ -57,10 +55,21 @@ public class Main {
         System.out.println("_".repeat(50));
 
         //Тест обновления эпика
-        taskManager.updateEpic(epic1);
+        taskManager.updateEpic(new Epic(epic1.getId(), epic1.getName(), "Обновленное описание эпика 2"));
+        System.out.println("Эпик после обновления: ");
+        System.out.println(taskManager.getEpics());
+        System.out.println(taskManager.getEpicById(epic1.getId()));
+        System.out.println("_".repeat(50));
 
-        //Тест обновления подзадачи
-        taskManager.updateSubtask(subtask1);
+        //Тест обновления подзадачи и статуса эпика
+        taskManager.updateSubtask(new Subtask(subtask3.getId(), subtask3.getName(), subtask3.getDescription(),
+                Status.DONE, subtask3.getEpicId()));
+        taskManager.updateSubtask(new Subtask(subtask4.getId(), subtask4.getName(), subtask4.getDescription(),
+                Status.IN_PROGRESS, subtask4.getEpicId()));
+        System.out.println("Подзадачи после обновления:");
+        System.out.println(taskManager.getSubtasks());
+        System.out.println(taskManager.getEpicById(epic2.getId()));
+        System.out.println("_".repeat(50));
 
         //Тест удаления задачи по id
         taskManager.deleteTask(2);
@@ -85,7 +94,6 @@ public class Main {
         System.out.println(taskManager.getTasks());
         taskManager.clearSubtasks();
         System.out.println(taskManager.getSubtasks());
-        System.out.println(taskManager.getEpics());
         taskManager.clearEpics();
         System.out.println(taskManager.getEpics());
     }

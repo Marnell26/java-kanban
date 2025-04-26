@@ -19,6 +19,7 @@ public class Task {
         this.name = name;
         this.description = description;
         this.status = status;
+        this.id = id;
     }
 
     public int getId() {
@@ -50,7 +51,7 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(id, this.id);
+        return Objects.equals(id, task.id);
     }
 
     @Override

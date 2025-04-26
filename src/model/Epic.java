@@ -11,9 +11,10 @@ public class Epic extends Task {
         this.status = Status.NEW;
     }
 
-    /*public Epic(String name, String description) {
+    public Epic(int id, String name, String description) {
         super(name, description);
-    }*/
+        this.id = id;
+    }
 
     public void addSubtask(Subtask subtask) {
         subtasks.add(subtask);
