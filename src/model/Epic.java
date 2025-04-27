@@ -32,14 +32,6 @@ public class Epic extends Task {
         return subtasks;
     }
 
-    public ArrayList<Status> getSubtasksStatuses() {
-        ArrayList<Status> subTaskStatuses = new ArrayList<>();
-        for (Subtask subtask : subtasks) {
-            subTaskStatuses.add(subtask.getStatus());
-        }
-        return subTaskStatuses;
-    }
-
     public ArrayList<Integer> getSubtasksIds() {
         ArrayList<Integer> subtasksIds = new ArrayList<>();
         for (Subtask subtask : subtasks) {

@@ -63,9 +63,11 @@ public class Main {
 
         //Тест обновления подзадачи и статуса эпика
         taskManager.updateSubtask(new Subtask(subtask3.getId(), subtask3.getName(), subtask3.getDescription(),
-                Status.DONE, subtask3.getEpicId()));
+                Status.IN_PROGRESS, subtask3.getEpicId()));
         taskManager.updateSubtask(new Subtask(subtask4.getId(), subtask4.getName(), subtask4.getDescription(),
-                Status.IN_PROGRESS, subtask4.getEpicId()));
+                Status.DONE, subtask4.getEpicId()));
+        Subtask subtask5 = new Subtask("Подзадача 3", "Описание подзадачи 3", epic2.getId());
+        taskManager.createSubtask(subtask5);
         System.out.println("Подзадачи после обновления:");
         System.out.println(taskManager.getSubtasks());
         System.out.println(taskManager.getEpicById(epic2.getId()));

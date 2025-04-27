@@ -47,7 +47,7 @@ public class TaskManager {
     }
 
     public void clearSubtasks() {
-        for (Epic epic: epics.values()) {
+        for (Epic epic : epics.values()) {
             epic.clearSubtasks();
             updateEpicStatus(epic);
         }
@@ -83,26 +83,25 @@ public class TaskManager {
         subtask.setId(id);
         Epic epic = epics.get(subtask.getEpicId());
         epic.addSubtask(subtask);
+        epic.setStatus(updateEpicStatus(epic));
         subtasks.put(id, subtask);
     }
 
     public void deleteTask(int id) {
-       tasks.remove(id);
+        tasks.remove(id);
     }
 
     public void deleteEpic(int id) {
-        Epic epic = epics.get(id);
+        Epic epic = epics.remove(id);
         for (Integer subtasksId : epic.getSubtasksIds()) {
             subtasks.remove(subtasksId);
         }
-        epics.remove(id);
     }
 
     public void deleteSubtask(int id) {
-        Subtask subtask = subtasks.get(id);
+        Subtask subtask = subtasks.remove(id);
         Epic epic = epics.get(subtask.getEpicId());
         epic.removeSubtask(subtask);
-        subtasks.remove(id);
     }
 
     public void updateTask(Task task) {
@@ -122,18 +121,20 @@ public class TaskManager {
     }
 
     private Status updateEpicStatus(Epic epic) {
-        ArrayList<Status> subTaskStatuses = epic.getSubtasksStatuses();
-        if (subTaskStatuses.isEmpty()) {
-            return Status.NEW;
+        ArrayList<Subtask> subTasks = epic.getSubtasks();
+        int doneCount = 0;
+        for (Subtask subtask : subTasks) {
+            if (subtask.getStatus().equals(Status.IN_PROGRESS)) {
+               return Status.IN_PROGRESS;
+            } else if (subtask.getStatus().equals(Status.DONE)) {
+                doneCount++;
+            }
         }
-        if (subTaskStatuses.contains(Status.IN_PROGRESS)) {
-            return Status.IN_PROGRESS;
-        }
-        else if (subTaskStatuses.contains(Status.NEW)) {
-            return Status.NEW;
+        if (doneCount == subTasks.size()) {
+            return Status.DONE;
         }
         else {
-            return Status.DONE;
+            return Status.NEW;
         }
     }
 
