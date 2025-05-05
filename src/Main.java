@@ -1,4 +1,4 @@
-import controller.TaskManager;
+import controller.InMemoryTaskManager;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -7,7 +7,7 @@ import model.Task;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
 
         //Тест добавления задач
         Task task1 = new Task("Задача 1", "Описание задачи 1");
