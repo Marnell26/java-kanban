@@ -2,14 +2,15 @@ package Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import controller.InMemoryTaskManager;
+import controller.*;
 import model.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 class InMemoryTaskManagerTest {
-    InMemoryTaskManager taskManager = new InMemoryTaskManager();
+    TaskManager taskManager = Managers.getDefault();
+    HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Test
     void addNewTask() {
@@ -27,14 +28,16 @@ class InMemoryTaskManagerTest {
         assertEquals(1, tasks.size());
         assertEquals(task, tasks.get(0), "Задачи не совпадают");
     }
- /*
+
+    @Test
     void addTaskToHistory() {
+        Task task = new Task("Задача 1", "Описание задачи 1");
         historyManager.add(task);
         final List<Task> history = historyManager.getHistory();
         assertNotNull(history, "После добавления задачи, история не должна быть пустой.");
         assertEquals(1, history.size(), "После добавления задачи, история не должна быть пустой.");
     }
-*/
+
 
 
 }
