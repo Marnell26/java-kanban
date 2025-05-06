@@ -1,5 +1,3 @@
-package Test;
-
 import model.*;
 import org.junit.jupiter.api.Test;
 
