@@ -13,4 +13,5 @@ public class SubtaskTest {
         subtask2.setId(1);
         assertEquals(subtask1, subtask2);
     }
+
 }

@@ -13,4 +13,5 @@ public class EpicTest {
         epic2.setId(1);
         assertEquals(epic1, epic2);
     }
+
 }

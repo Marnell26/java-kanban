@@ -13,26 +13,34 @@ public class InMemoryHistoryManagerTest {
     private HistoryManager historyManager;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         taskManager = Managers.getDefault();
         historyManager = Managers.getDefaultHistory();
     }
 
     @Test
-    public void addTaskToHistory() {
-
+    void addTaskToHistory() {
 
         Task task = new Task("Задача1", "Описание задачи 1");
         taskManager.createTask(task);
-
-        taskManager.getTaskById(task.getId());
-
         historyManager.add(task);
-
         List<Task> history = historyManager.getHistory();
-
-        assertEquals(1, history.size());
+        assertNotNull(history, "После добавления задачи, история не должна быть пустой");
         assertEquals(task, history.getFirst());
+    }
+
+    @Test
+    void historyListShouldNotBeLargerThanTheSpecifiedSize() {
+        int maxSize = InMemoryHistoryManager.getMaxSizeOfHistoryList();
+        for (int i = 1; i <= maxSize + 1; i++) {
+            Task task = new Task("Задача" + i, "Описание задачи" + i);
+            taskManager.createTask(task);
+            historyManager.add(task);
+        }
+        List<Task> history = historyManager.getHistory();
+        assertEquals(maxSize, history.size());
+        //Проверяем, что при добавлении 11-й задачи в историю 1-я была удалена
+        assertEquals(2, history.getFirst().getId());
     }
 
 
