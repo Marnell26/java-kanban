@@ -78,8 +78,8 @@ class InMemoryTaskManagerTest {
                 Status.IN_PROGRESS, subtask1.getId());
         taskManager.updateSubtask(updatedSubtask1);
         List<Subtask> subtasks = taskManager.getSubtasks();
-          assertNotEquals(subtasks.getFirst().getEpicId(), subtask1.getId(), "Объект Subtask получилось сделать " +
-                "своим же эпиком");
+          assertNotEquals(subtasks.getFirst().getEpicId(), subtask1.getId(),
+                  "Объект Subtask получилось сделать своим же эпиком");
     }
 
     @Test
@@ -88,8 +88,8 @@ class InMemoryTaskManagerTest {
         taskManager.createTask(task);
         Task updatedTask = new Task(task.getId(), "Задача", "Описание задачи", Status.IN_PROGRESS);
         taskManager.updateTask(updatedTask);
-        Task task1 = taskManager.getTasks().getFirst();
-        assertEquals(task1.getStatus(), updatedTask.getStatus());
+        Task comparedTask = taskManager.getTasks().getFirst();
+        assertEquals(comparedTask.getStatus(), updatedTask.getStatus());
     }
 
     @Test
@@ -98,8 +98,8 @@ class InMemoryTaskManagerTest {
         taskManager.createEpic(epic);
         Epic updatedEpic = new Epic(epic.getId(), "Эпик", "Измененное описание");
         taskManager.updateEpic(updatedEpic);
-        Epic epic1 = taskManager.getEpics().getFirst();
-        assertEquals(epic1.getDescription(), updatedEpic.getDescription());
+        Epic comparedEpic = taskManager.getEpics().getFirst();
+        assertEquals(comparedEpic.getDescription(), updatedEpic.getDescription());
     }
 
     @Test
@@ -108,10 +108,21 @@ class InMemoryTaskManagerTest {
         taskManager.createEpic(epic);
         Subtask subtask = new Subtask("Подзадача", "Описание", epic.getId());
         taskManager.createSubtask(subtask);
-        Subtask updatedSubtask = new Subtask(subtask.getId(), "Подзадача", "Описание", Status.IN_PROGRESS, subtask.getEpicId());
+        Subtask updatedSubtask = new Subtask(subtask.getId(), "Подзадача", "Описание", Status.IN_PROGRESS,
+                subtask.getEpicId());
         taskManager.updateSubtask(updatedSubtask);
-        Subtask subtask1 = taskManager.getSubtasks().getFirst();
-        assertEquals(subtask1.getStatus(), updatedSubtask.getStatus());
+        Subtask comparedSubtask = taskManager.getSubtasks().getFirst();
+        assertEquals(comparedSubtask.getStatus(), updatedSubtask.getStatus());
+    }
+
+    @Test
+    void shouldGenerateUniqueId() {
+        Task task1 = new Task("Задача1", "Описание1");
+        taskManager.createTask(task1);
+        Task task2 = new Task("Задача2", "Описание2");
+        taskManager.createTask(task2);
+        System.out.println(taskManager.getTasks());
+        assertNotEquals(task1.getId(), task2.getId(), "Id должны быть уникальными");
     }
 
     @Test
@@ -122,11 +133,11 @@ class InMemoryTaskManagerTest {
         Status taskStatus = task.getStatus();
         taskManager.createTask(task);
 
-        Task compareTask = taskManager.getTaskById(task.getId());
+        Task comparedTask = taskManager.getTaskById(task.getId());
 
-        assertEquals(taskName,compareTask.getName());
-        assertEquals(taskDescription, compareTask.getDescription());
-        assertEquals(taskStatus, compareTask.getStatus());
+        assertEquals(taskName, comparedTask.getName());
+        assertEquals(taskDescription, comparedTask.getDescription());
+        assertEquals(taskStatus, comparedTask.getStatus());
     }
 
 }
