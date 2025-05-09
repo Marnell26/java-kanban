@@ -31,7 +31,7 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     void historyListShouldNotBeLargerThanTheSpecifiedSize() {
-        int maxSize = InMemoryHistoryManager.getMaxSizeOfHistoryList();
+        int maxSize = InMemoryHistoryManager.MAX_SIZE_OF_HISTORY_LIST;
         for (int i = 1; i <= maxSize + 1; i++) {
             Task task = new Task("Задача" + i, "Описание задачи" + i);
             taskManager.createTask(task);
