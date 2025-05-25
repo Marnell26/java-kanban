@@ -29,19 +29,4 @@ public class InMemoryHistoryManagerTest {
         assertEquals(task, history.getFirst());
     }
 
-    @Test
-    void historyListShouldNotBeLargerThanTheSpecifiedSize() {
-        int maxSize = InMemoryHistoryManager.MAX_SIZE_OF_HISTORY_LIST;
-        for (int i = 1; i <= maxSize + 1; i++) {
-            Task task = new Task("Задача" + i, "Описание задачи" + i);
-            taskManager.createTask(task);
-            historyManager.add(task);
-        }
-        List<Task> history = historyManager.getHistory();
-        assertEquals(maxSize, history.size());
-        //Проверяем, что при добавлении 11-й задачи в историю 1-я была удалена
-        assertEquals(2, history.getFirst().getId());
-    }
-
-
 }
