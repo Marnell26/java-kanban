@@ -14,33 +14,14 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node historyTail;
 
     class Node {
-        private final Task task;
-        private Node prev;
-        private Node next;
+        Task task;
+        Node prev;
+        Node next;
 
         Node(Task task) {
             this.task = task;
         }
 
-        public Node getPrev() {
-            return prev;
-        }
-
-        public Task getItem() {
-            return task;
-        }
-
-        public Node getNext() {
-            return next;
-        }
-
-        public void setPrev(Node prev) {
-            this.prev = prev;
-        }
-
-        public void setNext(Node next) {
-            this.next = next;
-        }
     }
 
     @Override
@@ -57,8 +38,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (historyHead == null) {
             historyHead = node;
         } else {
-            historyTail.setNext(node);
-            node.setPrev(historyTail);
+            historyTail.next = node;
+            node.prev = historyTail;
         }
         historyTail = node;
     }
@@ -77,19 +58,19 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private void removeNode(Node node) {
         if (node == historyHead) {
-            historyHead = node.getNext();
+            historyHead = node.next;
         }
         if (node == historyTail) {
-            historyTail = node.getPrev();
+            historyTail = node.prev;
             if (historyTail != null) {
-                historyTail.setNext(null);
+                historyTail.next = null;
             }
         }
-        Node prev = node.getPrev();
-        Node next = node.getNext();
+        Node prev = node.prev;
+        Node next = node.next;
         if (prev != null && next != null) {
-            prev.setNext(next);
-            next.setPrev(prev);
+            prev.next = next;
+            next.prev = prev;
         }
 
     }
