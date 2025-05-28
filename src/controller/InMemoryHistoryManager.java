@@ -2,16 +2,13 @@ package controller;
 
 import model.Task;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
     private final Map<Integer, Node> tasksHistory = new HashMap<>();
-    private Node historyHead;
-    private Node historyTail;
+    private Node head;
+    private Node tail;
 
     class Node {
         Task task;
@@ -35,17 +32,13 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void linkLast(Node node) {
-        if (historyHead == null) {
-            historyHead = node;
+        if (head == null) {
+            head = node;
         } else {
-            historyTail.next = node;
-            node.prev = historyTail;
+            tail.next = node;
+            node.prev = tail;
         }
-        historyTail = node;
-    }
-
-    public void getTasks() {
-
+        tail = node;
     }
 
     @Override
@@ -57,13 +50,13 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void removeNode(Node node) {
-        if (node == historyHead) {
-            historyHead = node.next;
+        if (node == head) {
+            head = node.next;
         }
-        if (node == historyTail) {
-            historyTail = node.prev;
-            if (historyTail != null) {
-                historyTail.next = null;
+        if (node == tail) {
+            tail = node.prev;
+            if (tail != null) {
+                tail.next = null;
             }
         }
         Node prev = node.prev;
@@ -77,7 +70,14 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        return new LinkedList<>();
+        List<Task> history = new ArrayList<>();
+        Node current = head;
+        while(current != null) {
+            history.add(current.task);
+            current = current.next;
+        }
+
+        return history;
     }
 
 }
