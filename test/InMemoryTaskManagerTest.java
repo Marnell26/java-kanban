@@ -10,13 +10,11 @@ import java.util.List;
 class InMemoryTaskManagerTest {
 
     private TaskManager taskManager;
-    private HistoryManager historyManager;
 
     @BeforeEach
     void beforeEach() {
         taskManager = Managers.getDefault();
-        historyManager = Managers.getDefaultHistory();
-    }
+     }
 
     @Test
     void addNewTaskAndGetTaskById() {
@@ -78,8 +76,8 @@ class InMemoryTaskManagerTest {
                 Status.IN_PROGRESS, subtask1.getId());
         taskManager.updateSubtask(updatedSubtask1);
         List<Subtask> subtasks = taskManager.getSubtasks();
-          assertNotEquals(subtasks.getFirst().getEpicId(), subtask1.getId(),
-                  "Объект Subtask получилось сделать своим же эпиком");
+        assertNotEquals(subtasks.getFirst().getEpicId(), subtask1.getId(),
+                "Объект Subtask получилось сделать своим же эпиком");
     }
 
     @Test
@@ -138,6 +136,24 @@ class InMemoryTaskManagerTest {
         assertEquals(taskName, comparedTask.getName());
         assertEquals(taskDescription, comparedTask.getDescription());
         assertEquals(taskStatus, comparedTask.getStatus());
+    }
+
+    @Test
+    void shouldNotHaveIdAfterRemoveTask() {
+        Task task = new Task("Задача1", "Описание1");
+        taskManager.createTask(task);
+        taskManager.deleteTask(task.getId());
+        assertTrue(taskManager.getTasks().isEmpty(), "Задача не удалена");
+    }
+
+    @Test
+    void epicShouldNotHaveDeletedSubtask() {
+        Epic epic = new Epic("Эпик1", "Описание1");
+        taskManager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача1", "Описание1", epic.getId());
+        taskManager.createSubtask(subtask);
+        taskManager.deleteSubtask(subtask.getId());
+        assertTrue(taskManager.getSubtasksInEpic(epic.getId()).isEmpty(), "Подзадача не удалена из эпика");
     }
 
 }
