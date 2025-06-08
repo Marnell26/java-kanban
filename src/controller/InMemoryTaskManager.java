@@ -165,15 +165,14 @@ public class InMemoryTaskManager implements TaskManager {
         int doneCount = 0;
         for (Subtask subtask : subTasks) {
             if (subtask.getStatus().equals(Status.IN_PROGRESS)) {
-               return Status.IN_PROGRESS;
+                return Status.IN_PROGRESS;
             } else if (subtask.getStatus().equals(Status.DONE)) {
                 doneCount++;
             }
         }
         if (doneCount == subTasks.size()) {
             return Status.DONE;
-        }
-        else {
+        } else {
             return Status.NEW;
         }
     }
