@@ -5,6 +5,7 @@ import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 public class InMemoryHistoryManagerTest {
@@ -17,7 +18,7 @@ public class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void addTaskToHistory() {
+    void addTaskToHistory() throws IOException {
         Task task = new Task("Задача1", "Описание задачи 1");
         taskManager.createTask(task);
         taskManager.getTaskById(task.getId());
@@ -27,7 +28,7 @@ public class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void taskShouldBeRemovedFromHistoryWhenDeleted() {
+    void taskShouldBeRemovedFromHistoryWhenDeleted() throws IOException {
         Task task = new Task("Задача 1", "Описание 1");
         taskManager.createTask(task);
         taskManager.getTaskById(task.getId());
@@ -37,7 +38,7 @@ public class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void historyShouldContainOnlyLastTaskView() {
+    void historyShouldContainOnlyLastTaskView() throws IOException {
         Task task = new Task("Задача 1", "Описание 1");
         taskManager.createTask(task);
         taskManager.getTaskById(task.getId());
