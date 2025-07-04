@@ -19,14 +19,12 @@ public class Subtask extends Task {
         return epicId;
     }
 
+    public TaskType getType() {
+        return TaskType.SUBTASK;
+    }
+
     @Override
     public String toString() {
-        return "Subtask{" +
-                "epicId=" + epicId +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        return String.format("%d,SUBTASK,%s,%s,%s,%d", id, name, status, description, epicId);
     }
 }

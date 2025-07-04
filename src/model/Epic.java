@@ -29,6 +29,10 @@ public class Epic extends Task {
         subtasks.clear();
     }
 
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
     public List<Subtask> getSubtasks() {
         return new ArrayList<>(subtasks);
     }
@@ -43,12 +47,6 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
-                "subtasksId=" + getSubtasksIds() +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        return String.format("%d,EPIC,%s,%s,%s", id, name, status, description);
     }
 }
