@@ -42,14 +42,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = split[2];
         String description = split[4];
         Status status = Status.valueOf(split[3]);
-        int epicId = Integer.parseInt(split[5]);
         switch (taskType) {
             case TASK:
                 return new Task(id, name, description, status);
             case EPIC:
                 return new Epic(id, name, description);
             case SUBTASK:
-                return new Subtask(id, name, description, status, epicId);
+                return new Subtask(id, name, description, status, Integer.parseInt(split[5]));
             default:
                 throw new ManagerSaveException("Ошибка при чтении файла");
         }
@@ -59,10 +58,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         FileBackedTaskManager fileManager = new FileBackedTaskManager(file);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line =  reader.readLine();
+            reader.readLine(); //Пропускаем строку заголовка
+            String line;
             int idFromFile = 0;
-            while(reader.readLine() != null) {
-                line = reader.readLine();
+            while((line = reader.readLine()) != null) {
                 Task task = fromString(line);
                 TaskType taskType = task.getType();
                 idFromFile = task.getId();
@@ -90,6 +89,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return fileManager;
     }
 
+    public File getAutoSaveFile() {
+        return autoSaveFile;
+    }
+
     @Override
     public void clearTasks() {
         super.clearTasks();
@@ -109,19 +112,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void createTask(Task task) throws IOException {
+    public void createTask(Task task) {
         super.createTask(task);
         save();
     }
 
     @Override
-    public void createEpic(Epic epic) throws IOException {
+    public void createEpic(Epic epic) {
         super.createEpic(epic);
         save();
     }
 
     @Override
-    public void createSubtask(Subtask subtask) throws IOException {
+    public void createSubtask(Subtask subtask) {
         super.createSubtask(subtask);
         save();
     }

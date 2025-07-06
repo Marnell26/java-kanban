@@ -1,4 +1,3 @@
-import controller.FileBackedTaskManager;
 import controller.Managers;
 import controller.TaskManager;
 import model.Epic;
@@ -6,7 +5,6 @@ import model.Status;
 import model.Subtask;
 import model.Task;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -46,21 +44,6 @@ public class Main {
         System.out.println("Подзадачи эпика1:");
         System.out.println(taskManager.getSubtasksInEpic(epic1.getId()));
         System.out.println("_".repeat(50));
-
-        //Тест сохранения в файл
-        TaskManager fileManager = FileBackedTaskManager.loadFromFile(new File("C:\\Users\\gorobenkoes\\Documents\\123.csv"));
-        Task task01 = new Task("Задача 1", "Описание задачи 1");
-        Epic epic01 = new Epic("Эпик 1", "Описание эпика 1");
-        Epic epic02 = new Epic("Эпик 2", "Описание эпика 2");
-        Subtask subtask01 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic01.getId());
-        Subtask subtask02 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic01.getId());
-        Subtask subtask03 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic02.getId());
-        fileManager.createTask(task01);
-        fileManager.createEpic(epic01);
-        fileManager.createEpic(epic02);
-        fileManager.createSubtask(subtask01);
-        fileManager.createSubtask(subtask02);
-        fileManager.createSubtask(subtask03);
 
         //Тест получения задачи/эпика/подзадачи по id
         System.out.println(taskManager.getTaskById(task1.getId()));

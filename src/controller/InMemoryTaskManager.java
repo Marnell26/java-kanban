@@ -2,7 +2,6 @@ package controller;
 
 import model.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,21 +90,21 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createTask(Task task) throws IOException {
+    public void createTask(Task task) {
         int id = generateTaskId();
         task.setId(id);
         tasks.put(id, task);
     }
 
     @Override
-    public void createEpic(Epic epic) throws IOException {
+    public void createEpic(Epic epic){
         id = generateTaskId();
         epic.setId(id);
         epics.put(id, epic);
     }
 
     @Override
-    public void createSubtask(Subtask subtask) throws IOException {
+    public void createSubtask(Subtask subtask){
         Epic epic = epics.get(subtask.getEpicId());
         if (epic != null) {
             int id = generateTaskId();

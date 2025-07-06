@@ -26,11 +26,11 @@ public interface TaskManager {
 
     Subtask getSubtaskById(int id);
 
-    void createTask(Task task) throws IOException;
+    void createTask(Task task);
 
-    void createEpic(Epic epic) throws IOException;
+    void createEpic(Epic epic);
 
-    void createSubtask(Subtask subtask) throws IOException;
+    void createSubtask(Subtask subtask);
 
     void deleteTask(int id);
 
