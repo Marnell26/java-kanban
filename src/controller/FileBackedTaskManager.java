@@ -27,8 +27,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             for (Subtask subtask : getSubtasks()) {
                 writer.write(subtask.toString() + "\n");
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ManagerSaveException("Ошибка сохранения данных" + e.getMessage());
         }
     }
@@ -61,7 +60,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             reader.readLine(); //Пропускаем строку заголовка
             String line;
             int idFromFile = 0;
-            while((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 Task task = fromString(line);
                 TaskType taskType = task.getType();
                 idFromFile = task.getId();
@@ -74,15 +73,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         fileManager.epics.put(task.getId(), (Epic) task);
                         break;
                     case SUBTASK:
-                        fileManager.subtasks.put(task.getId(), (Subtask) task );
+                        fileManager.subtasks.put(task.getId(), (Subtask) task);
                         break;
                     default:
                         throw new ManagerSaveException("Ошибка при чтении файла");
                 }
             }
             fileManager.id = idFromFile;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при чтении файла");
         }
 
