@@ -66,7 +66,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 idFromFile = task.getId();
                 switch (taskType) {
                     case TASK:
-                        fileManager.createTask(task);
                         fileManager.tasks.put(task.getId(), task);
                         break;
                     case EPIC:

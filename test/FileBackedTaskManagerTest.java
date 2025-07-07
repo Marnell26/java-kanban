@@ -1,4 +1,5 @@
 import controller.FileBackedTaskManager;
+import controller.TaskManager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class FileBackedTaskManagerTest {
 
-    FileBackedTaskManager taskManager;
+    private FileBackedTaskManager taskManager;
 
     @BeforeEach
     void beforeEach() {
@@ -35,19 +36,19 @@ public class FileBackedTaskManagerTest {
         taskManager.createEpic(epic);
         Subtask subtask = new Subtask("Подзадача1", "Описание1", epic.getId());
         taskManager.createSubtask(subtask);
-        FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
-        assertEquals(task, taskManager.getTaskById(task.getId()));
-        assertEquals(epic, taskManager.getEpicById(epic.getId()));
-        assertEquals(subtask, taskManager.getSubtaskById(subtask.getId()));
+        TaskManager loadedTaskManager = FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
+        assertEquals(task, loadedTaskManager.getTaskById(task.getId()));
+        assertEquals(epic, loadedTaskManager.getEpicById(epic.getId()));
+        assertEquals(subtask, loadedTaskManager.getSubtaskById(subtask.getId()));
     }
 
     @Test
     void idMustBeStartWithNumberFromFile() {
         Task task1 = new Task("Задача1", "Описание1");
         taskManager.createTask(task1);
-        FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
+        TaskManager loadedTaskManager = FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
         Task task2 = new Task("Задача1", "Описание1");
-        taskManager.createTask(task2);
+        loadedTaskManager.createTask(task2);
         assertEquals(2, task2.getId());
     }
 
@@ -58,8 +59,8 @@ public class FileBackedTaskManagerTest {
         Task task2 = new Task("Задача2", "Описание2");
         taskManager.createTask(task2);
         taskManager.deleteTask(task1.getId());
-        FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
-        assertNull(taskManager.getTaskById(task1.getId()));
+        TaskManager loadedTaskManager = FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
+        assertNull(loadedTaskManager.getTaskById(task1.getId()));
     }
 
     @Test
@@ -69,8 +70,8 @@ public class FileBackedTaskManagerTest {
         Task task2 = new Task("Задача2", "Описание2");
         taskManager.createTask(task2);
         taskManager.clearTasks();
-        FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
-        assertEquals(0, taskManager.getTasks().size());
+        TaskManager loadedTaskManager =  FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
+        assertEquals(0, loadedTaskManager.getTasks().size());
     }
 
 }
