@@ -5,11 +5,12 @@ import model.Status;
 import model.Subtask;
 import model.Task;
 
+import java.io.IOException;
 import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         TaskManager taskManager =  Managers.getDefault();
         //Тест добавления задач
         Task task1 = new Task("Задача 1", "Описание задачи 1");
