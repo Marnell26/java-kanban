@@ -1,6 +1,9 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Task {
 
@@ -8,6 +11,8 @@ public class Task {
     protected String name;
     protected String description;
     protected Status status;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
     public Task(String name, String description) {
         this.name = name;
@@ -20,6 +25,24 @@ public class Task {
         this.description = description;
         this.status = status;
         this.id = id;
+
+    }
+
+    public Task(String name, String description, Duration duration, LocalDateTime startTime) {
+        this.name = name;
+        this.description = description;
+        this.status = Status.NEW;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
+    public Task(int id, String name, String description, Status status, Duration duration, LocalDateTime startTime) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.id = id;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
     public int getId() {
@@ -46,8 +69,20 @@ public class Task {
         this.status = status;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
     public TaskType getType() {
         return TaskType.TASK;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
     }
 
     @Override
@@ -65,6 +100,10 @@ public class Task {
 
     @Override
     public String toString() {
-        return String.format("%d,TASK,%s,%s,%s", id, name, status, description);
+        return String.format("%d,TASK,%s,%s,%s,%s,%s", id, name, status, description,
+                duration != null ? duration.toMinutes() : "null",
+                startTime != null ? startTime : "null");
     }
+
+
 }

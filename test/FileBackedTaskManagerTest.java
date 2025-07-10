@@ -11,16 +11,22 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FileBackedTaskManagerTest {
 
     private FileBackedTaskManager taskManager;
+    private Task task1;
 
     @BeforeEach
     void beforeEach() {
         taskManager = new FileBackedTaskManager(new File("test\\test.csv"));
+        task1 = new Task("Задача1", "Описание1", Duration.ofHours(2), LocalDateTime.of(2025, 7, 10, 9, 30));
+        taskManager.createTask(task1);
     }
 
     @AfterAll
@@ -30,22 +36,18 @@ public class FileBackedTaskManagerTest {
 
     @Test
     void saveAndReadFileTest() {
-        Task task = new Task("Задача1", "Описание1");
-        taskManager.createTask(task);
         Epic epic = new Epic("Эпик1", "Описание1");
         taskManager.createEpic(epic);
         Subtask subtask = new Subtask("Подзадача1", "Описание1", epic.getId());
         taskManager.createSubtask(subtask);
         TaskManager loadedTaskManager = FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
-        assertEquals(task, loadedTaskManager.getTaskById(task.getId()));
+        assertEquals(task1, loadedTaskManager.getTaskById(task1.getId()));
         assertEquals(epic, loadedTaskManager.getEpicById(epic.getId()));
         assertEquals(subtask, loadedTaskManager.getSubtaskById(subtask.getId()));
     }
 
     @Test
     void idMustBeStartWithNumberFromFile() {
-        Task task1 = new Task("Задача1", "Описание1");
-        taskManager.createTask(task1);
         TaskManager loadedTaskManager = FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
         Task task2 = new Task("Задача1", "Описание1");
         loadedTaskManager.createTask(task2);
@@ -54,8 +56,6 @@ public class FileBackedTaskManagerTest {
 
     @Test
     void taskMustBeRemovedFromFileIfDelete() {
-        Task task1 = new Task("Задача1", "Описание1");
-        taskManager.createTask(task1);
         Task task2 = new Task("Задача2", "Описание2");
         taskManager.createTask(task2);
         taskManager.deleteTask(task1.getId());
@@ -65,8 +65,6 @@ public class FileBackedTaskManagerTest {
 
     @Test
     void allTasksMustBeRemovedFromFileIfClear() {
-        Task task1 = new Task("Задача1", "Описание1");
-        taskManager.createTask(task1);
         Task task2 = new Task("Задача2", "Описание2");
         taskManager.createTask(task2);
         taskManager.clearTasks();
