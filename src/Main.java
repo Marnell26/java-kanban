@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
         //Тест добавления задач
         Task task1 = new Task("Задача 1", "Описание задачи 1");
