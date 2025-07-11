@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,9 +40,9 @@ public class FileBackedTaskManagerTest {
         Subtask subtask = new Subtask("Подзадача1", "Описание1", epic.getId());
         taskManager.createSubtask(subtask);
         TaskManager loadedTaskManager = FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
-        assertEquals(task1, loadedTaskManager.getTaskById(task1.getId()));
-        assertEquals(epic, loadedTaskManager.getEpicById(epic.getId()));
-        assertEquals(subtask, loadedTaskManager.getSubtaskById(subtask.getId()));
+        assertEquals(task1, loadedTaskManager.getTaskById(task1.getId()).orElse(null));
+        assertEquals(epic, loadedTaskManager.getEpicById(epic.getId()).orElse(null));
+        assertEquals(subtask, loadedTaskManager.getSubtaskById(subtask.getId()).orElse(null));
     }
 
     @Test
@@ -60,7 +59,7 @@ public class FileBackedTaskManagerTest {
         taskManager.createTask(task2);
         taskManager.deleteTask(task1.getId());
         TaskManager loadedTaskManager = FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
-        assertNull(loadedTaskManager.getTaskById(task1.getId()));
+        assertNull(loadedTaskManager.getTaskById(task1.getId()).orElse(null));
     }
 
     @Test
@@ -68,7 +67,7 @@ public class FileBackedTaskManagerTest {
         Task task2 = new Task("Задача2", "Описание2");
         taskManager.createTask(task2);
         taskManager.clearTasks();
-        TaskManager loadedTaskManager =  FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
+        TaskManager loadedTaskManager = FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
         assertEquals(0, loadedTaskManager.getTasks().size());
     }
 
