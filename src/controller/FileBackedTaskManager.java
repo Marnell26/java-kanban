@@ -1,9 +1,12 @@
 package controller;
 
+import exceptions.ManagerLoadException;
 import exceptions.ManagerSaveException;
 import model.*;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -17,7 +20,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(autoSaveFile))) {
             writer.write('\uFEFF');
-            writer.write("id,type,name,status,description,epic\n");
+            writer.write("id,type,name,status,description,duration,startTime,epic\n");
             for (Task task : getTasks()) {
                 writer.write(task.toString() + "\n");
             }
@@ -32,24 +35,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-
     private static Task fromString(String lineFromFile) {
         String[] split = lineFromFile.split(",");
-        split[0] = split[0].replace("\uFEFF", "");
-        TaskType taskType = TaskType.valueOf(split[1]);
+        if (split.length < 7) {
+            throw new ManagerLoadException("Ошибка при чтении файла: некорректный формат строки");
+        }
         int id = Integer.parseInt(split[0]);
+        String taskType = split[1];
         String name = split[2];
-        String description = split[4];
         Status status = Status.valueOf(split[3]);
+        String description = split[4];
+        Duration duration = split[5].equals("null") ? null : Duration.ofMinutes(Long.parseLong(split[5]));
+        LocalDateTime startTime = split[6].equals("null") ? null : LocalDateTime.parse(split[6]);
         switch (taskType) {
-            case TASK:
-                return new Task(id, name, description, status);
-            case EPIC:
+            case "TASK":
+                return new Task(id, name, description, status, duration, startTime);
+            case "EPIC":
                 return new Epic(id, name, description);
-            case SUBTASK:
-                return new Subtask(id, name, description, status, Integer.parseInt(split[5]));
+            case "SUBTASK":
+                return new Subtask(id, name, description, status, Integer.parseInt(split[7]), duration, startTime);
             default:
-                throw new ManagerSaveException("Ошибка при чтении файла");
+                throw new ManagerLoadException("Ошибка при чтении файла: некорректный тип задачи");
         }
     }
 
@@ -75,12 +81,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         fileManager.subtasks.put(task.getId(), (Subtask) task);
                         break;
                     default:
-                        throw new ManagerSaveException("Ошибка при чтении файла");
+                        throw new ManagerLoadException("Ошибка при чтении файла");
                 }
             }
             fileManager.id = idFromFile;
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при чтении файла");
+            throw new ManagerLoadException("Ошибка при чтении файла: не удалось найти указанный файл");
         }
 
         return fileManager;

@@ -5,13 +5,12 @@ import model.Status;
 import model.Subtask;
 import model.Task;
 
-import java.io.IOException;
 import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
-        TaskManager taskManager =  Managers.getDefault();
+    public static void main(String[] args) {
+        TaskManager taskManager = Managers.getDefault();
         //Тест добавления задач
         Task task1 = new Task("Задача 1", "Описание задачи 1");
         Task task2 = new Task("Задача 2", "Описание задачи 2");
@@ -104,7 +103,7 @@ public class Main {
         //Печать истории просмотра задач
         System.out.println("История просмотра: ");
         List<Task> history = taskManager.getHistory();
-        for (Task task: history) {
+        for (Task task : history) {
             System.out.println(task);
         }
     }
