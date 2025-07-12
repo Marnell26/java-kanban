@@ -11,21 +11,17 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class FileBackedTaskManagerTest {
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
-    private FileBackedTaskManager taskManager;
-    private Task task1;
-
+    @Override
     @BeforeEach
-    void beforeEach() {
+    protected void beforeEach() {
         taskManager = new FileBackedTaskManager(new File("test\\test.csv"));
-        task1 = new Task("Задача1", "Описание1", Duration.ofHours(2), LocalDateTime.of(2025, 7, 10, 9, 30));
-        taskManager.createTask(task1);
+        super.beforeEach();
     }
 
     @AfterAll
@@ -50,7 +46,7 @@ public class FileBackedTaskManagerTest {
         TaskManager loadedTaskManager = FileBackedTaskManager.loadFromFile(taskManager.getAutoSaveFile());
         Task task2 = new Task("Задача1", "Описание1");
         loadedTaskManager.createTask(task2);
-        assertEquals(2, task2.getId());
+        assertEquals(4, task2.getId());
     }
 
     @Test
