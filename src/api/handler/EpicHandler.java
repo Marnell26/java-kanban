@@ -1,8 +1,12 @@
 package api.handler;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import controller.TaskManager;
+import model.Epic;
+import model.Task;
 
 import java.io.IOException;
 
@@ -36,19 +40,39 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetEpics(HttpExchange exchange) throws IOException {
-
+        sendText(exchange, gson.toJson(taskManager.getEpics()));
     }
 
     private void handleGetEpic(HttpExchange exchange) throws IOException {
-
+        String stringId = exchange.getRequestURI().getPath().split("/")[2];
+        try {
+            int id = Integer.parseInt(stringId);
+            Epic epic = taskManager.getEpicById(id).orElse(null);
+            if (epic != null) {
+                sendText(exchange, gson.toJson(epic));
+            } else {
+                sendNotFound(exchange);
+            }
+        } catch (NumberFormatException e) {
+            sendNotFound(exchange);
+        }
     }
 
     private void handlePostEpic(HttpExchange exchange) throws IOException {
-
+        String stringId = exchange.getRequestURI().getPath().split("/")[2];
+        String requestBody = exchange.getRequestBody().toString();
+        JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
     }
 
     private void handleDeleteEpics(HttpExchange exchange) throws IOException {
-
+        String stringId = exchange.getRequestURI().getPath().split("/")[2];
+        try {
+            int id = Integer.parseInt(stringId);
+            taskManager.deleteEpic(id);
+            sendSuccessful(exchange, "Эпик с id " + id + " Успешно удален");
+        } catch (NumberFormatException e) {
+            sendNotFound(exchange);
+        }
     }
 
     private void sendUnknownMethod(HttpExchange exchange) throws IOException {

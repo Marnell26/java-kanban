@@ -1,8 +1,12 @@
 package api.handler;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import controller.TaskManager;
+import model.Task;
 
 import java.io.IOException;
 
@@ -43,10 +47,11 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         String stringId = exchange.getRequestURI().getPath().split("/")[2];
         try {
             int id = Integer.parseInt(stringId);
-            if (taskManager.getTaskById(id).isEmpty()) {
-                sendNotFound(exchange);
-            } else {
+            Task task = taskManager.getTaskById(id).orElse(null);
+            if (task != null) {
                 sendText(exchange, gson.toJson(task));
+            } else {
+                sendNotFound(exchange);
             }
         } catch (NumberFormatException e) {
             sendNotFound(exchange);
@@ -54,18 +59,33 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handlePostTask(HttpExchange exchange) throws IOException {
-        taskManager.createTask();
-        taskManager.updateTask();
-        sendText(exchange, );
+        String stringId = exchange.getRequestURI().getPath().split("/")[2];
+        String requestBody = exchange.getRequestBody().toString();
+        JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
+
+        try {
+            int id = Integer.parseInt(stringId);
+            Task task = gson.fromJson(jsonObject, Task.class);
+
+        } catch (NumberFormatException e) {
+            sendNotFound(exchange);
+        }
+
     }
 
     private void handleDeleteTask(HttpExchange exchange) throws IOException {
-        taskManager.deleteTask();
-        sendText(exchange, );
+        String stringId = exchange.getRequestURI().getPath().split("/")[2];
+        try {
+            int id = Integer.parseInt(stringId);
+            taskManager.deleteTask(id);
+            sendSuccessful(exchange, "Задача с id " + id + " Успешно удалена");
+        } catch (NumberFormatException e) {
+            sendNotFound(exchange);
+        }
     }
 
     private void sendUnknownMethod(HttpExchange exchange) throws IOException {
-        sendText(exchange, );
+        sendNotFound(exchange);
     }
 
 
