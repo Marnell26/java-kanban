@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import controller.TaskManager;
+import exceptions.TaskIntersectionException;
 import model.Subtask;
 
 import java.io.IOException;
@@ -61,6 +62,29 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
         String stringId = exchange.getRequestURI().getPath().split("/")[2];
         String requestBody = exchange.getRequestBody().toString();
         JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
+        Subtask subtask = gson.fromJson(jsonObject, Subtask.class);
+        int id = 0;
+        try {
+            id = Integer.parseInt(stringId);
+        } catch (NumberFormatException e) {
+            sendNotFound(exchange);
+        }
+
+        if (taskManager.getTaskById(id).isPresent()) {
+            try {
+                taskManager.createSubtask(subtask);
+                sendSuccessful(exchange, "Задача успешно создана");
+            } catch (TaskIntersectionException e) {
+                sendHasIntersections(exchange);
+            }
+        } else {
+            try {
+                taskManager.updateSubtask(subtask);
+                sendSuccessful(exchange, "Задача с id " + id + " успешно обновлена");
+            } catch (TaskIntersectionException e) {
+                sendHasIntersections(exchange);
+            }
+        }
     }
 
     private void handleDeleteSubtask(HttpExchange exchange) throws IOException {

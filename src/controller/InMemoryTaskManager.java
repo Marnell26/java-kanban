@@ -1,6 +1,10 @@
 package controller;
 
-import model.*;
+import exceptions.ManagerSaveException;
+import model.Epic;
+import model.Status;
+import model.Subtask;
+import model.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -94,6 +98,8 @@ public class InMemoryTaskManager implements TaskManager {
             if (task.getStartTime() != null) {
                 prioritizedTasks.add(task);
             }
+        } else {
+            throw new ManagerSaveException("Задача пересекается по времени с другими задачами");
         }
     }
 
@@ -119,6 +125,8 @@ public class InMemoryTaskManager implements TaskManager {
             if (subtask.getStartTime() != null) {
                 prioritizedTasks.add(subtask);
             }
+        } else {
+            throw new ManagerSaveException("Подзадача пересекается по времени с другими задачами");
         }
     }
 
@@ -160,6 +168,8 @@ public class InMemoryTaskManager implements TaskManager {
             if (task.getStartTime() != null) {
                 prioritizedTasks.add(task);
             }
+        } else {
+            throw new ManagerSaveException("Задача пересекается по времени с другими задачами");
         }
     }
 
@@ -183,6 +193,8 @@ public class InMemoryTaskManager implements TaskManager {
                     setEpicTimeProperties(epic);
                 }
             }
+        } else {
+            throw new ManagerSaveException("Подзадача пересекается по времени с другими задачами");
         }
     }
 

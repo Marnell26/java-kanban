@@ -61,6 +61,21 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
         String stringId = exchange.getRequestURI().getPath().split("/")[2];
         String requestBody = exchange.getRequestBody().toString();
         JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
+        Epic epic = gson.fromJson(jsonObject, Epic.class);
+        int id = 0;
+        try {
+            id = Integer.parseInt(stringId);
+        } catch (NumberFormatException e) {
+            sendNotFound(exchange);
+        }
+
+        if (taskManager.getEpicById(id).isPresent()) {
+            taskManager.createEpic(epic);
+            sendSuccessful(exchange, "Эпик успешно создан");
+        } else {
+            taskManager.updateEpic(epic);
+            sendSuccessful(exchange, "Эпик с id " + id + " успешно обновлен");
+        }
     }
 
     private void handleDeleteEpics(HttpExchange exchange) throws IOException {

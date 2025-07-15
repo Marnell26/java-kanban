@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import controller.TaskManager;
+import exceptions.TaskIntersectionException;
 import model.Task;
 
 import java.io.IOException;
@@ -61,13 +62,28 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         String stringId = exchange.getRequestURI().getPath().split("/")[2];
         String requestBody = exchange.getRequestBody().toString();
         JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
-
+        Task task = gson.fromJson(jsonObject, Task.class);
+        int id = 0;
         try {
-            int id = Integer.parseInt(stringId);
-            Task task = gson.fromJson(jsonObject, Task.class);
-
+            id = Integer.parseInt(stringId);
         } catch (NumberFormatException e) {
             sendNotFound(exchange);
+        }
+
+        if (taskManager.getTaskById(id).isPresent()) {
+            try {
+                taskManager.createTask(task);
+                sendSuccessful(exchange, "Задача успешно создана");
+            } catch (TaskIntersectionException e) {
+                sendHasIntersections(exchange);
+            }
+        } else {
+            try {
+                taskManager.updateTask(task);
+                sendSuccessful(exchange, "Задача с id " + id + " успешно обновлена");
+            } catch (TaskIntersectionException e) {
+                sendHasIntersections(exchange);
+            }
         }
 
     }
@@ -77,7 +93,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         try {
             int id = Integer.parseInt(stringId);
             taskManager.deleteTask(id);
-            sendSuccessful(exchange, "Задача с id " + id + " Успешно удалена");
+            sendSuccessful(exchange, "Задача с id " + id + " успешно удалена");
         } catch (NumberFormatException e) {
             sendNotFound(exchange);
         }
