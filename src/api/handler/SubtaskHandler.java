@@ -103,7 +103,7 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void sendUnknownMethod(HttpExchange exchange) throws IOException {
-
+        sendNotFound(exchange);
     }
 
     private Endpoint getEndpoint(String requestPath, String requestMethod) {
