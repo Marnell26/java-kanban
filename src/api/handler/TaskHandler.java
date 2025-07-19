@@ -9,6 +9,7 @@ import exceptions.TaskIntersectionException;
 import model.Task;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
@@ -60,7 +61,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
     private void handlePostTask(HttpExchange exchange) throws IOException {
         String stringId = exchange.getRequestURI().getPath().split("/")[2];
-        String requestBody = exchange.getRequestBody().toString();
+        String requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
         Task task = gson.fromJson(jsonObject, Task.class);
         int id = 0;

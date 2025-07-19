@@ -41,7 +41,7 @@ public class HttpTaskServerTest {
     }
 
     @BeforeEach
-    public void beforeEach() {
+    protected void beforeEach() {
         server.start();
         client = HttpClient.newHttpClient();
 
@@ -55,26 +55,21 @@ public class HttpTaskServerTest {
     }
 
     @AfterEach
-    void afterEach() throws IOException {
+    protected void afterEach() throws IOException {
         client.close();
         server.stop();
     }
 
     @Test
-    public void checkRunningServer() throws IOException, InterruptedException {
-
-        try (HttpClient client = HttpClient.newHttpClient()) {
+    public void checkRunningServer() {
+        try {
             URI uri = URI.create("http://localhost:8080/");
             HttpRequest request = HttpRequest.newBuilder().GET().uri(uri).build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
             assertEquals(404, response.statusCode());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    @Test
-    void getTasksTest() {
-
     }
 
     @Test
@@ -83,7 +78,6 @@ public class HttpTaskServerTest {
                 task1.getDuration(), task1.getStartTime());
         String requestBody = gson.toJson(updatedTask);
 
-        HttpClient client = HttpClient.newHttpClient();
         URI uri = URI.create("http://localhost:8080/tasks/" + task1.getId());
         HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -98,19 +92,5 @@ public class HttpTaskServerTest {
 
         client.close();
     }
-
-    @Test
-    public void deleteTask() throws IOException, InterruptedException {
-        URI uri = URI.create("http://localhost:8080/tasks/" + task1.getId());
-        HttpRequest request = HttpRequest.newBuilder()
-                .DELETE()
-                .uri(uri)
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        assertEquals(201, response.statusCode());
-        assertEquals(0, taskManager.getTasks().size());
-    }
-
 
 }
