@@ -127,5 +127,4 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     enum Endpoint {GET_TASK, GET_TASKS, POST_TASK, DELETE_TASK, UNKNOWN}
-
 }
