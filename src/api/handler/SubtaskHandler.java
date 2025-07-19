@@ -9,6 +9,7 @@ import exceptions.TaskIntersectionException;
 import model.Subtask;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
 
@@ -59,30 +60,29 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handlePostSubtask(HttpExchange exchange) throws IOException {
-        String stringId = exchange.getRequestURI().getPath().split("/")[2];
-        String requestBody = exchange.getRequestBody().toString();
+        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+        String requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
         Subtask subtask = gson.fromJson(jsonObject, Subtask.class);
-        int id = 0;
-        try {
-            id = Integer.parseInt(stringId);
-        } catch (NumberFormatException e) {
-            sendNotFound(exchange);
-        }
-
-        if (taskManager.getTaskById(id).isPresent()) {
+        if (pathParts.length == 2) {
             try {
                 taskManager.createSubtask(subtask);
-                sendSuccessful(exchange, "Задача успешно создана");
+                sendSuccessful(exchange, "Подзадача успешно создана");
             } catch (TaskIntersectionException e) {
                 sendHasIntersections(exchange);
             }
         } else {
+            String stringId = pathParts[2];
             try {
-                taskManager.updateSubtask(subtask);
-                sendSuccessful(exchange, "Задача с id " + id + " успешно обновлена");
-            } catch (TaskIntersectionException e) {
-                sendHasIntersections(exchange);
+                int id = Integer.parseInt(stringId);
+                try {
+                    taskManager.updateSubtask(subtask);
+                    sendSuccessful(exchange, "Подзадача с id " + id + " успешно обновлена");
+                } catch (TaskIntersectionException e) {
+                    sendHasIntersections(exchange);
+                }
+            } catch (NumberFormatException e) {
+                sendNotFound(exchange);
             }
         }
     }
@@ -91,8 +91,12 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
         String stringId = exchange.getRequestURI().getPath().split("/")[2];
         try {
             int id = Integer.parseInt(stringId);
-            taskManager.deleteSubtask(id);
-            sendSuccessful(exchange, "Подзадача с id " + id + " Успешно удалена");
+            if (taskManager.getSubtaskById(id).isPresent()) {
+                taskManager.deleteSubtask(id);
+                sendSuccessful(exchange, "Подзадача с id " + id + " Успешно удалена");
+            } else {
+                sendNotFound(exchange);
+            }
         } catch (NumberFormatException e) {
             sendNotFound(exchange);
         }

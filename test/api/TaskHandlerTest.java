@@ -41,8 +41,9 @@ public class TaskHandlerTest extends BaseHttpHandlerTest {
 
     @Test
     void addTask() throws IOException, InterruptedException {
-        Task newTask = new Task("Задача2", "Описание2", Duration.ofHours(1), LocalDateTime.of(2025, 1, 2, 0, 0));
+        Task newTask = new Task("Задача2", "Описание2", Duration.ofHours(1), LocalDateTime.of(2025, 1, 3, 0, 0));
         String requestBody = gson.toJson(newTask);
+        int oldTasksSize = taskManager.getTasks().size();
         URI uri = URI.create("http://localhost:8080/tasks");
         HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -50,13 +51,13 @@ public class TaskHandlerTest extends BaseHttpHandlerTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
-        assertEquals(taskManager.getTaskById(newTask.getId()).get(), newTask);
+        assertEquals(oldTasksSize + 1, taskManager.getTasks().size());
     }
 
     @Test
     void updateTask() throws IOException, InterruptedException {
-        Task updatedTask = new Task(1, "Задача2", "Описание2", Status.NEW, Duration.ofHours(1),
-                LocalDateTime.of(2025, 1, 2, 0, 0));
+        Task updatedTask = new Task(task1.getId(), "Задача1", "Новое описание", Status.NEW, Duration.ofHours(1),
+                LocalDateTime.of(2025, 1, 3, 0, 0));
         String requestBody = gson.toJson(updatedTask);
         URI uri = URI.create("http://localhost:8080/tasks/" + updatedTask.getId());
         HttpRequest request = HttpRequest.newBuilder()

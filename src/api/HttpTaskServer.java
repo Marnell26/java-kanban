@@ -36,6 +36,6 @@ public class HttpTaskServer {
 
     public void stop() {
         System.out.println("Stopping HTTP Task Server...");
-        httpServer.stop(1);
+        httpServer.stop(0);
     }
 }

@@ -7,7 +7,6 @@ import com.google.gson.GsonBuilder;
 import controller.Managers;
 import controller.TaskManager;
 import model.Epic;
-import model.Status;
 import model.Subtask;
 import model.Task;
 import org.junit.jupiter.api.AfterEach;
@@ -72,25 +71,5 @@ public class HttpTaskServerTest {
         }
     }
 
-    @Test
-    public void addTask_Update() throws IOException, InterruptedException {
-        Task updatedTask = new Task(task1.getId(), "Измененное имя", "Измененное описание", Status.DONE,
-                task1.getDuration(), task1.getStartTime());
-        String requestBody = gson.toJson(updatedTask);
-
-        URI uri = URI.create("http://localhost:8080/tasks/" + task1.getId());
-        HttpRequest request = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .uri(uri)
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        assertEquals(201, response.statusCode());
-        assertEquals(1, taskManager.getTasks().size());
-        assertEquals("Измененное имя", taskManager.getTaskById(1).get().getName());
-        assertEquals(Status.DONE, taskManager.getTaskById(1).get().getStatus());
-
-        client.close();
-    }
 
 }

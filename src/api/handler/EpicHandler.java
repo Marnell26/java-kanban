@@ -5,9 +5,12 @@ import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import controller.TaskManager;
+import exceptions.TaskIntersectionException;
 import model.Epic;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class EpicHandler extends BaseHttpHandler implements HttpHandler {
 
@@ -25,6 +28,9 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
                 break;
             case GET_EPIC:
                 handleGetEpic(exchange);
+                break;
+            case GET_EPIC_SUBTASKS:
+                handleGetEpicSubtasks(exchange);
                 break;
             case POST_EPIC:
                 handlePostEpic(exchange);
@@ -57,24 +63,51 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
-    private void handlePostEpic(HttpExchange exchange) throws IOException {
+    private void handleGetEpicSubtasks(HttpExchange exchange) throws IOException {
         String stringId = exchange.getRequestURI().getPath().split("/")[2];
-        String requestBody = exchange.getRequestBody().toString();
-        JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
-        Epic epic = gson.fromJson(jsonObject, Epic.class);
-        int id = 0;
         try {
-            id = Integer.parseInt(stringId);
+            int id = Integer.parseInt(stringId);
+            Epic epic = taskManager.getEpicById(id).orElse(null);
+            if (epic != null) {
+                sendText(exchange, gson.toJson(epic.getSubtasks()));
+            } else {
+                sendNotFound(exchange);
+            }
         } catch (NumberFormatException e) {
             sendNotFound(exchange);
         }
+    }
 
-        if (taskManager.getEpicById(id).isPresent()) {
-            taskManager.createEpic(epic);
-            sendSuccessful(exchange, "Эпик успешно создан");
+    private void handlePostEpic(HttpExchange exchange) throws IOException {
+        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+        System.out.println(Arrays.toString(pathParts));
+        String requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        System.out.println(requestBody);
+        JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
+        System.out.println(jsonObject);
+        Epic epic = gson.fromJson(jsonObject, Epic.class);
+        System.out.println(epic);
+
+        if (pathParts.length == 2) {
+            try {
+                taskManager.createEpic(epic);
+                sendSuccessful(exchange, "Эпик успешно создан");
+            } catch (TaskIntersectionException e) {
+                sendHasIntersections(exchange);
+            }
         } else {
-            taskManager.updateEpic(epic);
-            sendSuccessful(exchange, "Эпик с id " + id + " успешно обновлен");
+            String stringId = pathParts[2];
+            try {
+                int id = Integer.parseInt(stringId);
+                try {
+                    taskManager.updateEpic(epic);
+                    sendSuccessful(exchange, "Эпик с id " + id + " успешно обновлен");
+                } catch (TaskIntersectionException e) {
+                    sendHasIntersections(exchange);
+                }
+            } catch (NumberFormatException e) {
+                sendNotFound(exchange);
+            }
         }
     }
 
@@ -82,8 +115,12 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
         String stringId = exchange.getRequestURI().getPath().split("/")[2];
         try {
             int id = Integer.parseInt(stringId);
-            taskManager.deleteEpic(id);
-            sendSuccessful(exchange, "Эпик с id " + id + " Успешно удален");
+            if (taskManager.getEpicById(id).isPresent()) {
+                taskManager.deleteEpic(id);
+                sendSuccessful(exchange, "Эпик с id " + id + " Успешно удален");
+            } else {
+                sendNotFound(exchange);
+            }
         } catch (NumberFormatException e) {
             sendNotFound(exchange);
         }
@@ -100,8 +137,12 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
             case "GET":
                 if (pathParts.length == 2) {
                     return Endpoint.GET_EPICS;
-                } else {
+                } else if (pathParts.length == 3) {
                     return Endpoint.GET_EPIC;
+                } else if (pathParts.length == 4) {
+                    return Endpoint.GET_EPIC_SUBTASKS;
+                } else {
+                    return Endpoint.UNKNOWN;
                 }
             case "POST":
                 return Endpoint.POST_EPIC;
@@ -112,6 +153,6 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
-    enum Endpoint {GET_EPIC, GET_EPICS, POST_EPIC, DELETE_EPIC, UNKNOWN}
+    enum Endpoint {GET_EPIC, GET_EPICS, GET_EPIC_SUBTASKS, POST_EPIC, DELETE_EPIC, UNKNOWN}
 
 }

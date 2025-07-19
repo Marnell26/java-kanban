@@ -60,18 +60,11 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handlePostTask(HttpExchange exchange) throws IOException {
-        String stringId = exchange.getRequestURI().getPath().split("/")[2];
+        String[] pathParts = exchange.getRequestURI().getPath().split("/");
         String requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
         Task task = gson.fromJson(jsonObject, Task.class);
-        int id = 0;
-        try {
-            id = Integer.parseInt(stringId);
-        } catch (NumberFormatException e) {
-            sendNotFound(exchange);
-        }
-
-        if (taskManager.getTaskById(id).isPresent()) {
+        if (pathParts.length == 2) {
             try {
                 taskManager.createTask(task);
                 sendSuccessful(exchange, "Задача успешно создана");
@@ -79,22 +72,31 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
                 sendHasIntersections(exchange);
             }
         } else {
+            String stringId = pathParts[2];
             try {
-                taskManager.updateTask(task);
-                sendSuccessful(exchange, "Задача с id " + id + " успешно обновлена");
-            } catch (TaskIntersectionException e) {
-                sendHasIntersections(exchange);
+                int id = Integer.parseInt(stringId);
+                try {
+                    taskManager.updateTask(task);
+                    sendSuccessful(exchange, "Задача с id " + id + " успешно обновлена");
+                } catch (TaskIntersectionException e) {
+                    sendHasIntersections(exchange);
+                }
+            } catch (NumberFormatException e) {
+                sendNotFound(exchange);
             }
         }
-
     }
 
     private void handleDeleteTask(HttpExchange exchange) throws IOException {
         String stringId = exchange.getRequestURI().getPath().split("/")[2];
         try {
             int id = Integer.parseInt(stringId);
-            taskManager.deleteTask(id);
-            sendSuccessful(exchange, "Задача с id " + id + " успешно удалена");
+            if (taskManager.getTaskById(id).isPresent()) {
+                taskManager.deleteTask(id);
+                sendSuccessful(exchange, "Задача с id " + id + " успешно удалена");
+            } else {
+                sendNotFound(exchange);
+            }
         } catch (NumberFormatException e) {
             sendNotFound(exchange);
         }

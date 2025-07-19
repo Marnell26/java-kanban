@@ -37,14 +37,15 @@ public class SubtaskHandlerTest extends BaseHttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         Task responseSubtask = gson.fromJson(response.body(), Subtask.class);
         assertEquals(200, response.statusCode());
-        assertEquals(taskManager.getTaskById(subtask1.getId()).get(), responseSubtask);
+        assertEquals(taskManager.getSubtaskById(subtask1.getId()).get(), responseSubtask);
     }
 
     @Test
     void addSubtask() throws IOException, InterruptedException {
-        Subtask newSubtask = new Subtask("Задача2", "Описание2", epic1.getId(), Duration.ofHours(1),
-                LocalDateTime.of(2025, 1, 2, 0, 0));
+        Subtask newSubtask = new Subtask("Подзадача2", "Описание2", epic1.getId(), Duration.ofHours(1),
+                LocalDateTime.of(2025, 1, 3, 0, 0));
         String requestBody = gson.toJson(newSubtask);
+        int oldSubtasksSize = taskManager.getSubtasks().size();
         URI uri = URI.create("http://localhost:8080/subtasks");
         HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -52,13 +53,13 @@ public class SubtaskHandlerTest extends BaseHttpHandlerTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
-        assertEquals(taskManager.getTaskById(newSubtask.getId()).get(), newSubtask);
+        assertEquals(oldSubtasksSize + 1, taskManager.getSubtasks().size());
     }
 
     @Test
     void updateSubtask() throws IOException, InterruptedException {
-        Subtask updatedSubtask = new Subtask(1, "Задача2", "Описание2", Status.NEW, epic1.getId(), Duration.ofHours(1),
-                LocalDateTime.of(2025, 1, 2, 0, 0));
+        Subtask updatedSubtask = new Subtask(subtask1.getId(), "Подзадача1", "Новое описание", Status.IN_PROGRESS,
+                epic1.getId(), Duration.ofHours(1), LocalDateTime.of(2025, 1, 3, 0, 0));
         String requestBody = gson.toJson(updatedSubtask);
         URI uri = URI.create("http://localhost:8080/subtasks/" + updatedSubtask.getId());
         HttpRequest request = HttpRequest.newBuilder()
@@ -67,7 +68,7 @@ public class SubtaskHandlerTest extends BaseHttpHandlerTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
-        assertEquals(taskManager.getTaskById(updatedSubtask.getId()).get(), updatedSubtask);
+        assertEquals(taskManager.getSubtaskById(updatedSubtask.getId()).get(), updatedSubtask);
     }
 
     @Test

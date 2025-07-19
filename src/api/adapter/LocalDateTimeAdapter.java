@@ -17,7 +17,7 @@ public class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
         if (localDateTime != null) {
             jsonWriter.value(localDateTime.format(formatter));
         } else {
-            jsonWriter.value("");
+            jsonWriter.value(LocalDateTime.now().format(formatter));
         }
     }
 

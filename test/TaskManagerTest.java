@@ -74,7 +74,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void subTaskCantBeOwnEpic() {
         //Пытаемся обновить сабтаск, заменив его epicId на Id самого сабтаска
         Subtask updatedSubtask1 = new Subtask(subtask1.getId(), "Подзадача 1", "Описание 1",
-                Status.IN_PROGRESS, subtask1.getId());
+                Status.IN_PROGRESS, subtask1.getId(), Duration.ofHours(1), LocalDateTime.of(2025, 5, 1, 0, 0));
         taskManager.updateSubtask(updatedSubtask1);
         List<Subtask> subtasks = taskManager.getSubtasks();
         assertNotEquals(subtasks.getFirst().getEpicId(), subtask1.getId(),

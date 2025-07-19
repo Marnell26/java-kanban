@@ -181,20 +181,22 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask subtask) {
         Epic epic = epics.get(subtask.getEpicId());
-        if (epic != null && !isTaskIntersection(subtask)) {
-            subtasks.put(subtask.getId(), subtask);
-            epic.removeSubtask(subtask);
-            epic.addSubtask(subtask);
-            epic.setStatus(updateEpicStatus(epic));
-            prioritizedTasks.removeIf(currentTask -> currentTask.getId() == subtask.getId());
-            if (subtask.getStartTime() != null) {
-                prioritizedTasks.add(subtask);
-                if (subtask.getDuration() != null) {
-                    setEpicTimeProperties(epic);
+        if (epic != null) {
+            if (!isTaskIntersection(subtask)) {
+                subtasks.put(subtask.getId(), subtask);
+                epic.removeSubtask(subtask);
+                epic.addSubtask(subtask);
+                epic.setStatus(updateEpicStatus(epic));
+                prioritizedTasks.removeIf(currentTask -> currentTask.getId() == subtask.getId());
+                if (subtask.getStartTime() != null) {
+                    prioritizedTasks.add(subtask);
+                    if (subtask.getDuration() != null) {
+                        setEpicTimeProperties(epic);
+                    }
                 }
+            } else {
+                throw new ManagerSaveException("Подзадача пересекается по времени с другими задачами");
             }
-        } else {
-            throw new ManagerSaveException("Подзадача пересекается по времени с другими задачами");
         }
     }
 
@@ -252,6 +254,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (newTask.getStartTime() != null) {
             List<Task> prioritizedTasks = getPrioritizedTasks();
             return prioritizedTasks.stream()
+                    .filter(task -> task.getId() != newTask.getId())
                     .anyMatch(task -> isTasksTimeIntersection(newTask, task));
         }
         return false;
