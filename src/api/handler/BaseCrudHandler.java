@@ -6,7 +6,7 @@ import controller.TaskManager;
 
 import java.io.IOException;
 
-abstract class BaseCrudHandler<T> extends BaseHttpHandler implements HttpHandler {
+abstract class BaseCrudHandler extends BaseHttpHandler implements HttpHandler {
 
     public BaseCrudHandler(TaskManager taskManager) {
         super(taskManager);

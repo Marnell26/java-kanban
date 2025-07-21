@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-public class TaskHandler extends BaseCrudHandler<Task> {
+public class TaskHandler extends BaseCrudHandler {
 
     public TaskHandler(TaskManager taskManager) {
         super(taskManager);

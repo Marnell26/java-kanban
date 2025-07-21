@@ -4,13 +4,12 @@ import com.sun.net.httpserver.HttpExchange;
 import controller.TaskManager;
 import exceptions.TaskIntersectionException;
 import model.Epic;
-import model.Task;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-public class EpicHandler extends BaseCrudHandler<Task> {
+public class EpicHandler extends BaseCrudHandler {
 
     public EpicHandler(TaskManager taskManager) {
         super(taskManager);

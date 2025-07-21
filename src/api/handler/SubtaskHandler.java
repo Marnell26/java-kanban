@@ -4,13 +4,12 @@ import com.sun.net.httpserver.HttpExchange;
 import controller.TaskManager;
 import exceptions.TaskIntersectionException;
 import model.Subtask;
-import model.Task;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-public class SubtaskHandler extends BaseCrudHandler<Task> {
+public class SubtaskHandler extends BaseCrudHandler {
 
     public SubtaskHandler(TaskManager taskManager) {
         super(taskManager);
