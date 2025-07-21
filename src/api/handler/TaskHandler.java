@@ -1,132 +1,64 @@
 package api.handler;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import controller.TaskManager;
 import exceptions.TaskIntersectionException;
 import model.Task;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
-public class TaskHandler extends BaseHttpHandler implements HttpHandler {
+public class TaskHandler extends BaseCrudHandler<Task> {
 
     public TaskHandler(TaskManager taskManager) {
         super(taskManager);
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod());
-
-        switch (endpoint) {
-            case GET_TASKS:
-                handleGetTasks(exchange);
-                break;
-            case GET_TASK:
-                handleGetTask(exchange);
-                break;
-            case POST_TASK:
-                handlePostTask(exchange);
-                break;
-            case DELETE_TASK:
-                handleDeleteTask(exchange);
-                break;
-            case UNKNOWN:
-                sendUnknownMethod(exchange);
-                break;
-        }
-    }
-
-    private void handleGetTasks(HttpExchange exchange) throws IOException {
-        sendText(exchange, gson.toJson(taskManager.getTasks()));
-    }
-
-    private void handleGetTask(HttpExchange exchange) throws IOException {
-        String stringId = exchange.getRequestURI().getPath().split("/")[2];
-        try {
-            int id = Integer.parseInt(stringId);
-            Task task = taskManager.getTaskById(id).orElse(null);
-            if (task != null) {
-                sendText(exchange, gson.toJson(task));
+    protected void handleGet(HttpExchange exchange, String[] path) throws IOException {
+        if (requestHasId(path)) {
+            Optional<Task> task = taskManager.getTaskById(getIdFromRequest(exchange, path));
+            if (task.isPresent()) {
+                sendText(exchange, gson.toJson(task.get()));
             } else {
-                sendNotFound(exchange);
+                sendNotFound(exchange, "Задача с id " + getIdFromRequest(exchange, path) + " не найдена");
             }
-        } catch (NumberFormatException e) {
-            sendNotFound(exchange);
+        } else {
+            sendText(exchange, gson.toJson(taskManager.getTasks()));
         }
     }
 
-    private void handlePostTask(HttpExchange exchange) throws IOException {
-        String[] pathParts = exchange.getRequestURI().getPath().split("/");
-        String requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
-        Task task = gson.fromJson(jsonObject, Task.class);
-        if (pathParts.length == 2) {
+    @Override
+    protected void handlePost(HttpExchange exchange, String[] path) throws IOException {
+        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        Task task = gson.fromJson(body, Task.class);
+        if (requestHasId(path) && taskManager.getTaskById(getIdFromRequest(exchange, path)).isPresent()) {
+            try {
+                taskManager.updateTask(task);
+                sendSuccessful(exchange, "Задача с id " + getIdFromRequest(exchange, path) + " успешно обновлена");
+            } catch (TaskIntersectionException e) {
+                sendHasIntersections(exchange);
+            }
+        } else {
             try {
                 taskManager.createTask(task);
                 sendSuccessful(exchange, "Задача успешно создана");
             } catch (TaskIntersectionException e) {
                 sendHasIntersections(exchange);
             }
+        }
+    }
+
+    @Override
+    protected void handleDelete(HttpExchange exchange, String[] path) throws IOException {
+        int id = getIdFromRequest(exchange, path);
+        if (taskManager.getTaskById(id).isPresent()) {
+            taskManager.deleteTask(getIdFromRequest(exchange, path));
+            sendSuccessful(exchange, "Задача с id " + id + " успешно удалена");
         } else {
-            String stringId = pathParts[2];
-            try {
-                int id = Integer.parseInt(stringId);
-                try {
-                    taskManager.updateTask(task);
-                    sendSuccessful(exchange, "Задача с id " + id + " успешно обновлена");
-                } catch (TaskIntersectionException e) {
-                    sendHasIntersections(exchange);
-                }
-            } catch (NumberFormatException e) {
-                sendNotFound(exchange);
-            }
+            sendNotFound(exchange, "Задача с id " + getIdFromRequest(exchange, path) + " не найдена");
         }
     }
 
-    private void handleDeleteTask(HttpExchange exchange) throws IOException {
-        String stringId = exchange.getRequestURI().getPath().split("/")[2];
-        try {
-            int id = Integer.parseInt(stringId);
-            if (taskManager.getTaskById(id).isPresent()) {
-                taskManager.deleteTask(id);
-                sendSuccessful(exchange, "Задача с id " + id + " успешно удалена");
-            } else {
-                sendNotFound(exchange);
-            }
-        } catch (NumberFormatException e) {
-            sendNotFound(exchange);
-        }
-    }
-
-    private void sendUnknownMethod(HttpExchange exchange) throws IOException {
-        sendNotFound(exchange);
-    }
-
-
-    private Endpoint getEndpoint(String requestPath, String requestMethod) {
-        String[] pathParts = requestPath.split("/");
-
-        switch (requestMethod) {
-            case "GET":
-                if (pathParts.length == 2) {
-                    return Endpoint.GET_TASKS;
-                } else {
-                    return Endpoint.GET_TASK;
-                }
-            case "POST":
-                return Endpoint.POST_TASK;
-            case "DELETE":
-                return Endpoint.DELETE_TASK;
-            default:
-                return Endpoint.UNKNOWN;
-        }
-    }
-
-    enum Endpoint {
-        GET_TASK, GET_TASKS, POST_TASK, DELETE_TASK, UNKNOWN
-    }
 }

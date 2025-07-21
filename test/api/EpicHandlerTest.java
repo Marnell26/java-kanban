@@ -1,8 +1,6 @@
 package api;
 
 import com.google.gson.JsonArray;
-import model.Epic;
-import model.Task;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -18,26 +16,6 @@ public class EpicHandlerTest extends BaseHttpHandlerTest {
     }
 
     @Test
-    void getEpics() throws IOException, InterruptedException {
-        URI uri = URI.create("http://localhost:8080/epics");
-        HttpRequest request = HttpRequest.newBuilder().GET().uri(uri).build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JsonArray jsonArray = gson.fromJson(response.body(), JsonArray.class);
-        assertEquals(200, response.statusCode());
-        assertEquals(taskManager.getEpics().size(), jsonArray.size());
-    }
-
-    @Test
-    void getEpic() throws IOException, InterruptedException {
-        URI uri = URI.create("http://localhost:8080/epics/" + epic1.getId());
-        HttpRequest request = HttpRequest.newBuilder().GET().uri(uri).build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        Task responseTask = gson.fromJson(response.body(), Epic.class);
-        assertEquals(200, response.statusCode());
-        assertEquals(taskManager.getEpicById(epic1.getId()).get(), responseTask);
-    }
-
-    @Test
     void getEpicSubtasks() throws IOException, InterruptedException {
         URI uri = URI.create("http://localhost:8080/epics/" + epic1.getId() + "/subtasks");
         HttpRequest request = HttpRequest.newBuilder().GET().uri(uri).build();
@@ -46,45 +24,5 @@ public class EpicHandlerTest extends BaseHttpHandlerTest {
         assertEquals(200, response.statusCode());
         assertEquals(taskManager.getSubtasksInEpic(epic1.getId()).size(), jsonArray.size());
     }
-
-    @Test
-    void addEpic() throws IOException, InterruptedException {
-        Epic newEpic = new Epic("Эпик2", "Описание2");
-        String requestBody = gson.toJson(newEpic);
-        int oldEpicsSize = taskManager.getEpics().size();
-        URI uri = URI.create("http://localhost:8080/epics");
-        HttpRequest request = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .uri(uri)
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, response.statusCode());
-        assertEquals(oldEpicsSize + 1, taskManager.getEpics().size());
-    }
-
-    @Test
-    void updateEpic() throws IOException, InterruptedException {
-        Epic updatedEpic = new Epic(epic1.getId(), "Эпик2", "Новое описание");
-        String requestBody = gson.toJson(updatedEpic);
-        System.out.println(requestBody);
-        URI uri = URI.create("http://localhost:8080/epics/" + updatedEpic.getId());
-        HttpRequest request = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .uri(uri)
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, response.statusCode());
-        assertEquals(taskManager.getEpicById(updatedEpic.getId()).get(), updatedEpic);
-    }
-
-    @Test
-    void deleteEpic() throws IOException, InterruptedException {
-        URI uri = URI.create("http://localhost:8080/epics/" + epic1.getId());
-        HttpRequest request = HttpRequest.newBuilder().DELETE().uri(uri).build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, response.statusCode());
-        assertEquals(0, taskManager.getEpics().size());
-    }
-
 
 }

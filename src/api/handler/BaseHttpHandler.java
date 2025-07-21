@@ -42,8 +42,10 @@ public class BaseHttpHandler {
         exchange.close();
     }
 
-    protected void sendNotFound(HttpExchange exchange) throws IOException {
-        exchange.sendResponseHeaders(404, 0);
+    protected void sendNotFound(HttpExchange exchange, String text) throws IOException {
+        byte[] response = text.getBytes(StandardCharsets.UTF_8);
+        exchange.sendResponseHeaders(404, response.length);
+        exchange.getResponseBody().write(response);
         exchange.close();
     }
 
