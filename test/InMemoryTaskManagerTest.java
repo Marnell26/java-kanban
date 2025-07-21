@@ -1,4 +1,5 @@
 import controller.InMemoryTaskManager;
+import exceptions.ManagerSaveException;
 import model.Subtask;
 import model.Task;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,10 +23,11 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     void isTasksTimeIntersectionTest() {
         Subtask subtask2 = new Subtask("Подзадача1", "Описание1", epic1.getId(), Duration.ofHours(1),
                 LocalDateTime.of(2025, 1, 1, 0, 30));
-        taskManager.createSubtask(subtask2);
         //subtask1 не пересекается с task1, subtask2 имеет пересечение с task
+        assertThrows(ManagerSaveException.class, () -> {
+            taskManager.createSubtask(subtask2);
+        }, "Должно выбрасываться исключение, если есть пересечение задач по времени");
         assertNotNull(taskManager.getSubtaskById(subtask1.getId()).orElse(null));
-        assertNull(taskManager.getSubtaskById(subtask2.getId()).orElse(null));
     }
 
     @Test
