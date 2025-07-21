@@ -58,7 +58,7 @@ public class BaseHttpHandlerTest {
     }
 
     @AfterEach
-    protected void afterEach() throws IOException {
+    protected void afterEach() {
         client.close();
         server.stop();
     }
